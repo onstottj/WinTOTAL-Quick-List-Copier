@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WinTOTAL_Quick_List_Copier.ui;
 
 namespace WinTOTAL_Quick_List_Copier
 {

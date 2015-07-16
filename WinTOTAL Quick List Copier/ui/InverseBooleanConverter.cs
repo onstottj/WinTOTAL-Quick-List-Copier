@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace WinTOTAL_Quick_List_Copier
+namespace WinTOTAL_Quick_List_Copier.ui
 {
     /// <summary>
     /// From http://stackoverflow.com/a/1039681/132374
