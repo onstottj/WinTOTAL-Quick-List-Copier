@@ -22,6 +22,7 @@ namespace WinTOTAL_Quick_List_Copier
     {
         public MainWindow()
         {
+            this.Resources["InverseBooleanConverter"] = new InverseBooleanConverter();
             InitializeComponent();
         }
     }

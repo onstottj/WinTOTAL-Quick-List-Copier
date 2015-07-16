@@ -13,7 +13,15 @@
         </StackPanel>
         <TabControl DockPanel.Dock="Bottom" Margin="0,10,0,0">
             <TabItem Header="Server connections">
-                <CheckBox Margin="5">There is a single WinTOTAL server</CheckBox>
+                <StackPanel Orientation="Vertical">
+                    <Label>Source server SQL connection string:</Label>
+                    <TextBox x:Name="txtSourceConnString" Text="See http://www.connectionstrings.com/sql-server/" />
+
+                    <Label>Destination server SQL connection string:</Label>
+                    <TextBox x:Name="txtDestinationConnStr" IsEnabled="{Binding ElementName=chkSingleServer, Path=IsChecked, Converter={StaticResource InverseBooleanConverter}}" Text="See http://www.connectionstrings.com/sql-server/" />
+                    
+                    <CheckBox x:Name="chkSingleServer" Margin="5" IsChecked="True" HorizontalAlignment="Center">There is a single WinTOTAL server</CheckBox>
+                </StackPanel>
             </TabItem>
         </TabControl>
     </DockPanel>
