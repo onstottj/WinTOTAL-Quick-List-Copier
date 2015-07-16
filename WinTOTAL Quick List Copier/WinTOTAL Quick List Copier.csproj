@@ -34,8 +34,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -53,6 +62,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="data\QuickList.cs">
+      <DependentUpon>WintotalSqlModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="data\QuickListEntry.cs">
+      <DependentUpon>WintotalSqlModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="data\QuickListName.cs">
+      <DependentUpon>WintotalSqlModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="data\WintotalSqlModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WintotalSqlModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="data\WintotalSqlModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WintotalSqlModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="data\WintotalSqlModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WintotalSqlModel.edmx</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -85,14 +118,35 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <EntityDeploy Include="data\WintotalSqlModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>WintotalSqlModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="data\WintotalSqlModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>WintotalSqlModel.edmx</DependentUpon>
+      <LastGenOutput>WintotalSqlModel.Context.cs</LastGenOutput>
+    </None>
+    <None Include="data\WintotalSqlModel.edmx.diagram">
+      <DependentUpon>WintotalSqlModel.edmx</DependentUpon>
+    </None>
+    <None Include="data\WintotalSqlModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>WintotalSqlModel.edmx</DependentUpon>
+      <LastGenOutput>WintotalSqlModel.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
