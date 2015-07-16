@@ -17,9 +17,6 @@ using WinTOTAL_Quick_List_Copier.ui;
 
 namespace WinTOTAL_Quick_List_Copier
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
@@ -28,19 +25,16 @@ namespace WinTOTAL_Quick_List_Copier
             InitializeComponent();
         }
 
-        private void lnkRefreshSource_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        private void lnkRefreshSource_Click(object sender, RoutedEventArgs e)
         {
-            //var connectionString = "data source=dellosaurus;initial catalog=WinTOTAL_OLD;persist security info=True;user id=jon;password=***********;MultipleActiveResultSets=True;App=EntityFramework";
             UpdateCurrentData(txtSourceConnString.Text);
-            e.Handled = true;
         }
 
-        private void lnkRefreshDestination_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        private void lnkRefreshDestination_Click(object sender, RoutedEventArgs e)
         {
             UpdateCurrentData(txtDestinationConnStr.Text);
-            e.Handled = true;
         }
-
+        
         private void UpdateCurrentData(string connectionString)
         {
             var finalConnectionString = @"metadata=res://*/data.WintotalSqlModel.csdl
@@ -52,6 +46,14 @@ namespace WinTOTAL_Quick_List_Copier
             using (var entities = new WinTOTAL_Quick_List_Copier.data.Entities() )
             {
                 entities.ChangeDatabase(connectionString);
+                lbQuicklistUsers.Items.Clear();
+                var names = from n in entities.QuickListNames
+                            orderby n.Name
+                            select n.Name;
+                foreach (var name in names.Distinct())
+                {
+                    lbQuicklistUsers.Items.Add(name);
+                }
             }
         }
     }

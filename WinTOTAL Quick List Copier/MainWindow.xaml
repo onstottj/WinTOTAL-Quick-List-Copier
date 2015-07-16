@@ -33,10 +33,10 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock TextWrapping="WrapWithOverflow">
-                            <Hyperlink x:Name="lnkRefreshSource" RequestNavigate="lnkRefreshSource_RequestNavigate">Refresh from source</Hyperlink>
+                            <Hyperlink x:Name="lnkRefreshSource" Click="lnkRefreshSource_Click">Refresh from source</Hyperlink>
                             </TextBlock>
                             <TextBlock TextWrapping="WrapWithOverflow" Margin="10,0,0,0">
-                            <Hyperlink x:Name="lnkRefreshDestination" RequestNavigate="lnkRefreshDestination_RequestNavigate">Refresh from destination</Hyperlink>
+                            <Hyperlink x:Name="lnkRefreshDestination" Click="lnkRefreshDestination_Click">Refresh from destination</Hyperlink>
                             </TextBlock>
                         </StackPanel>
 
