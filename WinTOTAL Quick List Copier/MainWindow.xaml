@@ -31,17 +31,27 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock TextWrapping="WrapWithOverflow">
+                            <Hyperlink x:Name="lnkRefreshSource" RequestNavigate="lnkRefreshSource_RequestNavigate">Refresh from source</Hyperlink>
+                            </TextBlock>
+                            <TextBlock TextWrapping="WrapWithOverflow" Margin="10,0,0,0">
+                            <Hyperlink x:Name="lnkRefreshDestination" RequestNavigate="lnkRefreshDestination_RequestNavigate">Refresh from destination</Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+
                         <Label>Users with quicklists:</Label>
+
                         <ListBox x:Name="lbQuicklistUsers"/>
                     </StackPanel>
 
                     <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
-                    
+
                     <StackPanel Grid.Column="2" >
                         <Label>abC</Label>
                     </StackPanel>
                 </Grid>
-            </TabItem>            
+            </TabItem>
         </TabControl>
     </DockPanel>
 </Window>
