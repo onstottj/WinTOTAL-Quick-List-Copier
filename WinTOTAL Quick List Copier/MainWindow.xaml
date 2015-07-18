@@ -14,7 +14,7 @@
             <TabItem Header="Server connections">
                 <StackPanel Orientation="Vertical">
                     <Label Content="Source server SQL connection string:"/>
-                    <TextBox x:Name="txtSourceConnString" Text="See http://www.connectionstrings.com/sql-server/" />
+                    <TextBox x:Name="txtSourceConnString" Text="data source=HOST;initial catalog=WinTOTAL;user id=USERID;password=PASSWORD;" />
 
                     <Label Content="Destination server SQL connection string:"/>
                     <TextBox x:Name="txtDestinationConnStr" IsEnabled="{Binding IsChecked, Converter={StaticResource InverseBooleanConverter}, ElementName=chkSingleServer}" Text="See http://www.connectionstrings.com/sql-server/" />

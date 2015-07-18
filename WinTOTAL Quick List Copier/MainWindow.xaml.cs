@@ -23,6 +23,8 @@ namespace WinTOTAL_Quick_List_Copier
         {
             this.Resources["InverseBooleanConverter"] = new InverseBooleanConverter();
             InitializeComponent();
+
+            txtSourceConnString.Focus();
         }
 
         private void lnkRefreshSource_Click(object sender, RoutedEventArgs e)
@@ -45,7 +47,7 @@ namespace WinTOTAL_Quick_List_Copier
                 |res://*/data.WintotalSqlModel.ssdl
                 |res://*/data.WintotalSqlModel.msl;
                 provider=System.Data.SqlClient;
-                provider connection string=" + "\"" + connectionString + "\"";
+                provider connection string=" + "\"" + connectionString + "MultipleActiveResultSets=True;App=EntityFramework\"";                
 
                 using (var entities = new WinTOTAL_Quick_List_Copier.data.Entities())
                 {
@@ -61,7 +63,7 @@ namespace WinTOTAL_Quick_List_Copier
             }
             catch (Exception e)
             {
-                MessageBox.Show("An error occurred loading data: " + e.Message);
+                MessageBox.Show("An error occurred loading data: " + e.Message, "Error");
             }
         }
     }
