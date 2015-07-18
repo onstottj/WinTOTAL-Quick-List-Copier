@@ -63,31 +63,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="data\ConnectionTools.cs" />
-    <Compile Include="data\QuickList.cs">
-      <DependentUpon>WintotalSqlModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="data\QuickListEntry.cs">
-      <DependentUpon>WintotalSqlModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="data\QuickListName.cs">
-      <DependentUpon>WintotalSqlModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="data\WintotalSqlModel.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>WintotalSqlModel.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="data\WintotalSqlModel.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>WintotalSqlModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="data\WintotalSqlModel.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>WintotalSqlModel.edmx</DependentUpon>
-    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -96,6 +71,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="data\QuickList.cs" />
+    <Compile Include="data\QuickListEntry.cs" />
+    <Compile Include="data\QuickListName.cs" />
+    <Compile Include="data\WintotalModel.cs" />
     <Compile Include="ui\InverseBooleanConverter.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -126,23 +105,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <EntityDeploy Include="data\WintotalSqlModel.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>WintotalSqlModel.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <None Include="data\WintotalSqlModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>WintotalSqlModel.edmx</DependentUpon>
-      <LastGenOutput>WintotalSqlModel.Context.cs</LastGenOutput>
-    </None>
-    <None Include="data\WintotalSqlModel.edmx.diagram">
-      <DependentUpon>WintotalSqlModel.edmx</DependentUpon>
-    </None>
-    <None Include="data\WintotalSqlModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>WintotalSqlModel.edmx</DependentUpon>
-      <LastGenOutput>WintotalSqlModel.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
