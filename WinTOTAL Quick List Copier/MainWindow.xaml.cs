@@ -43,18 +43,12 @@ namespace WinTOTAL_Quick_List_Copier
 
             try
             {
-                var finalConnectionString = @"metadata=res://*/data.WintotalSqlModel.csdl
-                |res://*/data.WintotalSqlModel.ssdl
-                |res://*/data.WintotalSqlModel.msl;
-                provider=System.Data.SqlClient;
-                provider connection string=" + "\"" + connectionString + "MultipleActiveResultSets=True;App=EntityFramework\"";                
-
-                using (var entities = new WinTOTAL_Quick_List_Copier.data.Entities())
+                using (var model = new WintotalModel(connectionString))
                 {
-                    entities.ChangeDatabase(connectionString);
-                    var names = from n in entities.QuickListNames
+                    var names = from n in model.QuickListNames
+                                join q in model.QuickLists on n.QLNameID equals q.QLNameID into qlstats
                                 orderby n.Name
-                                select n.Name;
+                                select n.Name + " - " + qlstats.Count() + " list(s)";
                     foreach (var name in names.Distinct())
                     {
                         lbQuicklistUsers.Items.Add(name);
