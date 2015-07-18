@@ -34,26 +34,34 @@ namespace WinTOTAL_Quick_List_Copier
         {
             UpdateCurrentData(txtDestinationConnStr.Text);
         }
-        
+
         private void UpdateCurrentData(string connectionString)
         {
-            var finalConnectionString = @"metadata=res://*/data.WintotalSqlModel.csdl
+            lbQuicklistUsers.Items.Clear();
+
+            try
+            {
+                var finalConnectionString = @"metadata=res://*/data.WintotalSqlModel.csdl
                 |res://*/data.WintotalSqlModel.ssdl
                 |res://*/data.WintotalSqlModel.msl;
                 provider=System.Data.SqlClient;
                 provider connection string=" + "\"" + connectionString + "\"";
-            
-            using (var entities = new WinTOTAL_Quick_List_Copier.data.Entities() )
-            {
-                entities.ChangeDatabase(connectionString);
-                lbQuicklistUsers.Items.Clear();
-                var names = from n in entities.QuickListNames
-                            orderby n.Name
-                            select n.Name;
-                foreach (var name in names.Distinct())
+
+                using (var entities = new WinTOTAL_Quick_List_Copier.data.Entities())
                 {
-                    lbQuicklistUsers.Items.Add(name);
+                    entities.ChangeDatabase(connectionString);
+                    var names = from n in entities.QuickListNames
+                                orderby n.Name
+                                select n.Name;
+                    foreach (var name in names.Distinct())
+                    {
+                        lbQuicklistUsers.Items.Add(name);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("An error occurred loading data: " + e.Message);
             }
         }
     }

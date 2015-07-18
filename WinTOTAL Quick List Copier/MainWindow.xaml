@@ -23,14 +23,8 @@
                 </StackPanel>
             </TabItem>
             <TabItem Header="Current data">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="5" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock TextWrapping="WrapWithOverflow">
                             <Hyperlink x:Name="lnkRefreshSource" Click="lnkRefreshSource_Click">Refresh from source</Hyperlink>
@@ -41,16 +35,10 @@
                         </StackPanel>
 
                         <Label>Users with quicklists:</Label>
-
-                        <ListBox x:Name="lbQuicklistUsers"/>
                     </StackPanel>
 
-                    <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
-
-                    <StackPanel Grid.Column="2" >
-                        <Label>abC</Label>
-                    </StackPanel>
-                </Grid>
+                    <ListBox x:Name="lbQuicklistUsers" DockPanel.Dock="Bottom"/>
+                </DockPanel>
             </TabItem>
         </TabControl>
     </DockPanel>
