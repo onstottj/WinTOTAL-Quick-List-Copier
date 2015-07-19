@@ -38,9 +38,13 @@ namespace WinTOTAL_Quick_List_Copier
             LoadUserList(sourceConnStr, lbSourceUsers, sourceUsers);
 
             // Load destination users
+            LoadUserList(GetDestinationConnectionString(), lbDestinationUsers, destinationUsers);
+        }
+
+        private string GetDestinationConnectionString()
+        {
             var isSingleServer = chkSingleServer.IsChecked.Value;
-            var destConnStr = isSingleServer ? sourceConnStr : txtDestinationConnStr.Text;
-            LoadUserList(sourceConnStr, lbDestinationUsers, destinationUsers);
+            return isSingleServer ? txtSourceConnString.Text : txtDestinationConnStr.Text;
         }
 
         private async void LoadUserList(string connectionString, ListBox listbox, Dictionary<int, string> userDictionary)
@@ -75,14 +79,64 @@ namespace WinTOTAL_Quick_List_Copier
             }
             catch (Exception e)
             {
-                MessageBox.Show("An error occurred loading data: " + e.Message, "Error");
+                ShowErrorMessage("An error occurred loading data: " + e.Message);
             }
         }
 
         private void lblCopyQuickLists_Click(object sender, RoutedEventArgs e)
         {
             var sourceUser = (WintotalUser)lbSourceUsers.SelectedItem;
-            MessageBox.Show(sourceUser != null ? "User " + sourceUser.Name + " with id " + sourceUser.QLNameID : "empty");
+            var destinationUser = (WintotalUser)lbDestinationUsers.SelectedItem;
+            if (sourceUser == null)
+            {
+                ShowErrorMessage("Please select a user to copy quick lists from.");
+            }
+            else if (destinationUser == null)
+            {
+                ShowErrorMessage("Please select a user to copy quick lists to.");
+            }
+            else
+            {
+                DeleteQuickListsOfUser(destinationUser.QLNameID, GetDestinationConnectionString());
+
+                // TODO
+            }
+        }
+
+        private void DeleteQuickListsOfUser(int qlNameID, string connectionString)
+        {
+            try
+            {
+                using (var model = new WintotalModel(connectionString))
+                {
+                    var quickLists = from q in model.QuickLists
+                                     where q.QLNameID == qlNameID
+                                     select q;
+                    foreach (var quickList in quickLists.ToList())
+                    {
+                        var entries = from e in model.QuickListEntries
+                                      where e.QLID == quickList.QLID
+                                      select e;
+                        foreach (var entry in entries.ToList())
+                        {
+                            model.QuickListEntries.Remove(entry);
+                        }
+
+                        model.QuickLists.Remove(quickList);
+                    }
+
+                    model.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                ShowErrorMessage("An error occurred while attempting to delete the destination user's quick lists: " + e.Message);
+            }
+        }
+
+        private void ShowErrorMessage(string message)
+        {
+            MessageBox.Show(message, "Error");
         }
     }
 
