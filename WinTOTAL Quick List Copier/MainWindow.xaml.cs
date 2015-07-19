@@ -20,6 +20,9 @@ namespace WinTOTAL_Quick_List_Copier
 {
     public partial class MainWindow : Window
     {
+        private Dictionary<int, string> sourceUsers = new Dictionary<int, string>();
+        private Dictionary<int, string> destinationUsers = new Dictionary<int, string>();
+
         public MainWindow()
         {
             this.Resources["InverseBooleanConverter"] = new InverseBooleanConverter();
@@ -30,15 +33,17 @@ namespace WinTOTAL_Quick_List_Copier
 
         private void lblLoadUsers_Click(object sender, RoutedEventArgs e)
         {
+            // Load source users
             var sourceConnStr = txtSourceConnString.Text;
-            LoadUserList(sourceConnStr, lbSourceUsers);
+            LoadUserList(sourceConnStr, lbSourceUsers, sourceUsers);
 
-            var isSingleServer= chkSingleServer.IsChecked.Value;
+            // Load destination users
+            var isSingleServer = chkSingleServer.IsChecked.Value;
             var destConnStr = isSingleServer ? sourceConnStr : txtDestinationConnStr.Text;
-            LoadUserList(sourceConnStr, lbDestinationUsers);
+            LoadUserList(sourceConnStr, lbDestinationUsers, destinationUsers);
         }
 
-        private async void LoadUserList(string connectionString, ListBox listbox)
+        private async void LoadUserList(string connectionString, ListBox listbox, Dictionary<int, string> userDictionary)
         {
             listbox.Items.Clear();
             listbox.Items.Add("Loading...");
@@ -47,14 +52,24 @@ namespace WinTOTAL_Quick_List_Copier
             {
                 using (var model = new WintotalModel(connectionString))
                 {
-                    var names = await (from n in model.QuickListNames
+                    var users = await (from n in model.QuickListNames
                                        join q in model.QuickLists on n.QLNameID equals q.QLNameID into qlstats
                                        orderby n.Name
-                                       select n.Name + " - " + qlstats.Count() + " list(s)").ToListAsync();
+                                       select new WintotalUser
+                                       {
+                                           QLNameID = n.QLNameID,
+                                           Name = n.Name + " - " + qlstats.Count() + " list(s)"
+                                       }).ToListAsync();
+
                     listbox.Items.Clear();
-                    foreach (var name in names.Distinct())
+                    listbox.SelectedValuePath = "QLNameID";
+                    listbox.DisplayMemberPath = "Name";
+
+                    userDictionary.Clear();
+                    foreach (var user in users.Distinct())
                     {
-                        listbox.Items.Add(name);
+                        listbox.Items.Add(user);
+                        userDictionary.Add(user.QLNameID, user.Name);
                     }
                 }
             }
@@ -66,7 +81,14 @@ namespace WinTOTAL_Quick_List_Copier
 
         private void lblCopyQuickLists_Click(object sender, RoutedEventArgs e)
         {
-
+            var sourceUser = (WintotalUser)lbSourceUsers.SelectedItem;
+            MessageBox.Show(sourceUser != null ? "User " + sourceUser.Name + " with id " + sourceUser.QLNameID : "empty");
         }
+    }
+
+    class WintotalUser
+    {
+        public int QLNameID { get; set; }
+        public string Name { get; set; }
     }
 }
