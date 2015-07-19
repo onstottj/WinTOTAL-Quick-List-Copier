@@ -28,20 +28,20 @@ namespace WinTOTAL_Quick_List_Copier
             txtSourceConnString.Focus();
         }
 
-        private void lnkRefreshSource_Click(object sender, RoutedEventArgs e)
+        private void lblLoadUsers_Click(object sender, RoutedEventArgs e)
         {
-            UpdateCurrentData(txtSourceConnString.Text);
+            var sourceConnStr = txtSourceConnString.Text;
+            LoadUserList(sourceConnStr, lbSourceUsers);
+
+            var isSingleServer= chkSingleServer.IsChecked.Value;
+            var destConnStr = isSingleServer ? sourceConnStr : txtDestinationConnStr.Text;
+            LoadUserList(sourceConnStr, lbDestinationUsers);
         }
 
-        private void lnkRefreshDestination_Click(object sender, RoutedEventArgs e)
+        private async void LoadUserList(string connectionString, ListBox listbox)
         {
-            UpdateCurrentData(txtDestinationConnStr.Text);
-        }
-
-        private async void UpdateCurrentData(string connectionString)
-        {
-            lbQuicklistUsers.Items.Clear();
-            lbQuicklistUsers.Items.Add("Loading...");
+            listbox.Items.Clear();
+            listbox.Items.Add("Loading...");
 
             try
             {
@@ -51,10 +51,10 @@ namespace WinTOTAL_Quick_List_Copier
                                        join q in model.QuickLists on n.QLNameID equals q.QLNameID into qlstats
                                        orderby n.Name
                                        select n.Name + " - " + qlstats.Count() + " list(s)").ToListAsync();
-                    lbQuicklistUsers.Items.Clear();
+                    listbox.Items.Clear();
                     foreach (var name in names.Distinct())
                     {
-                        lbQuicklistUsers.Items.Add(name);
+                        listbox.Items.Add(name);
                     }
                 }
             }
@@ -62,11 +62,6 @@ namespace WinTOTAL_Quick_List_Copier
             {
                 MessageBox.Show("An error occurred loading data: " + e.Message, "Error");
             }
-        }
-
-        private void lblLoadUsers_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void lblCopyQuickLists_Click(object sender, RoutedEventArgs e)
