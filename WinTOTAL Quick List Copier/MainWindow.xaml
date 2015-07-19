@@ -19,25 +19,49 @@
                     <Label Content="Destination server SQL connection string:"/>
                     <TextBox x:Name="txtDestinationConnStr" IsEnabled="{Binding IsChecked, Converter={StaticResource InverseBooleanConverter}, ElementName=chkSingleServer}" Text="Use SqlClient connection strings from https://msdn.microsoft.com/en-us/library/vstudio/ms254500(v=vs.100).aspx" />
 
-                    <CheckBox x:Name="chkSingleServer" Margin="5" IsChecked="True" HorizontalAlignment="Center" Content="There is a single WinTOTAL server"/>
+                    <CheckBox x:Name="chkSingleServer" Margin="5" IsChecked="True" HorizontalAlignment="Center" Content="The source and destination are the same"/>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="Current data">
+            <TabItem Header="Copy quick lists">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top">
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Vertical">
                             <TextBlock TextWrapping="WrapWithOverflow">
-                            <Hyperlink x:Name="lnkRefreshSource" Click="lnkRefreshSource_Click">Refresh from source</Hyperlink>
+                                1)  Load the list of users with quick lists by clicking 
+                                <Hyperlink x:Name="lblLoadUsers" Click="lblLoadUsers_Click">refresh</Hyperlink>
                             </TextBlock>
-                            <TextBlock TextWrapping="WrapWithOverflow" Margin="10,0,0,0">
-                            <Hyperlink x:Name="lnkRefreshDestination" Click="lnkRefreshDestination_Click">Refresh from destination</Hyperlink>
+                            <TextBlock TextWrapping="WrapWithOverflow">
+                                2)  Choose a user from Source to copy all quick lists from
+                            </TextBlock>
+                            <TextBlock TextWrapping="WrapWithOverflow">
+                                3)  Choose a user from Destination.  Their quick lists will be deleted in step 4, and the Source user's quick lists will be copied there.
+                            </TextBlock>
+                            <TextBlock TextWrapping="WrapWithOverflow">
+                                4)  Click 
+                                <Hyperlink x:Name="lblCopyQuickLists" Click="lblCopyQuickLists_Click">copy Source user lists to overwrite Destination user's lists</Hyperlink>
                             </TextBlock>
                         </StackPanel>
-
-                        <Label>Users with quicklists:</Label>
                     </StackPanel>
 
-                    <ListBox x:Name="lbQuicklistUsers" DockPanel.Dock="Bottom"/>
+                    <Grid DockPanel.Dock="Bottom">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <DockPanel>
+                            <Label  DockPanel.Dock="Top">Source:</Label>
+                            <ListBox DockPanel.Dock="Bottom" x:Name="lbSourceUsers"/>
+                        </DockPanel>
+
+                        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+
+                        <DockPanel Grid.Column="2">
+                            <Label  DockPanel.Dock="Top">Destination:</Label>
+                            <ListBox DockPanel.Dock="Bottom" x:Name="lbDestinationUsers"/>
+                        </DockPanel>
+                    </Grid>
                 </DockPanel>
             </TabItem>
         </TabControl>

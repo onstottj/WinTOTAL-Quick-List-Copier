@@ -63,5 +63,15 @@ namespace WinTOTAL_Quick_List_Copier
                 MessageBox.Show("An error occurred loading data: " + e.Message, "Error");
             }
         }
+
+        private void lblLoadUsers_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void lblCopyQuickLists_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
