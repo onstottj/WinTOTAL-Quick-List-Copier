@@ -14,7 +14,7 @@
             <TabItem Header="Database connections">
                 <StackPanel Orientation="Vertical">
                     <Label Content="Source server SQL connection string:"/>
-                    <TextBox x:Name="txtSourceConnString" Text="User ID=*****;Password=*****;Initial Catalog=AdventureWorks;Server=MySqlServer" />
+                    <TextBox x:Name="txtSourceConnString" Text="Initial Catalog=WinTOTAL;Server=MySqlServer;User ID=*****;Password=*****" />
 
                     <Label Content="Destination server SQL connection string:"/>
                     <TextBox x:Name="txtDestinationConnStr" IsEnabled="{Binding IsChecked, Converter={StaticResource InverseBooleanConverter}, ElementName=chkSingleServer}" Text="Use SqlClient connection strings from https://msdn.microsoft.com/en-us/library/vstudio/ms254500(v=vs.100).aspx" />
