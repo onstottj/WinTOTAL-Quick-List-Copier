@@ -20,6 +20,9 @@ namespace WinTOTAL_Quick_List_Copier
 {
     public partial class MainWindow : Window
     {
+        private Dictionary<int, string> sourceUsers = new Dictionary<int, string>();
+        private Dictionary<int, string> destinationUsers = new Dictionary<int, string>();
+
         public MainWindow()
         {
             this.Resources["InverseBooleanConverter"] = new InverseBooleanConverter();
@@ -28,40 +31,149 @@ namespace WinTOTAL_Quick_List_Copier
             txtSourceConnString.Focus();
         }
 
-        private void lnkRefreshSource_Click(object sender, RoutedEventArgs e)
+        private void lblLoadUsers_Click(object sender, RoutedEventArgs e)
         {
-            UpdateCurrentData(txtSourceConnString.Text);
+            // Load source users
+            var sourceConnStr = txtSourceConnString.Text;
+            LoadUserList(sourceConnStr, lbSourceUsers, sourceUsers);
+
+            // Load destination users
+            LoadUserList(GetDestinationConnectionString(), lbDestinationUsers, destinationUsers);
         }
 
-        private void lnkRefreshDestination_Click(object sender, RoutedEventArgs e)
+        private string GetDestinationConnectionString()
         {
-            UpdateCurrentData(txtDestinationConnStr.Text);
+            var isSingleServer = chkSingleServer.IsChecked.Value;
+            return isSingleServer ? txtSourceConnString.Text : txtDestinationConnStr.Text;
         }
 
-        private async void UpdateCurrentData(string connectionString)
+        private async void LoadUserList(string connectionString, ListBox listbox, Dictionary<int, string> userDictionary)
         {
-            lbQuicklistUsers.Items.Clear();
-            lbQuicklistUsers.Items.Add("Loading...");
+            listbox.Items.Clear();
+            listbox.Items.Add("Loading...");
 
             try
             {
                 using (var model = new WintotalModel(connectionString))
                 {
-                    var names = await (from n in model.QuickListNames
+                    var users = await (from n in model.QuickListNames
                                        join q in model.QuickLists on n.QLNameID equals q.QLNameID into qlstats
                                        orderby n.Name
-                                       select n.Name + " - " + qlstats.Count() + " list(s)").ToListAsync();
-                    lbQuicklistUsers.Items.Clear();
-                    foreach (var name in names.Distinct())
+                                       select new WintotalUser
+                                       {
+                                           QLNameID = n.QLNameID,
+                                           Name = n.Name + " - " + qlstats.Count() + " list(s)"
+                                       }).ToListAsync();
+
+                    listbox.Items.Clear();
+                    listbox.SelectedValuePath = "QLNameID";
+                    listbox.DisplayMemberPath = "Name";
+
+                    userDictionary.Clear();
+                    foreach (var user in users.Distinct())
                     {
-                        lbQuicklistUsers.Items.Add(name);
+                        listbox.Items.Add(user);
+                        userDictionary.Add(user.QLNameID, user.Name);
                     }
                 }
             }
             catch (Exception e)
             {
-                MessageBox.Show("An error occurred loading data: " + e.Message, "Error");
+                ShowErrorMessage("An error occurred loading data: " + e.Message);
             }
         }
+
+        private void lblCopyQuickLists_Click(object sender, RoutedEventArgs e)
+        {
+            var sourceUser = (WintotalUser)lbSourceUsers.SelectedItem;
+            var destinationUser = (WintotalUser)lbDestinationUsers.SelectedItem;
+            if (sourceUser == null)
+            {
+                ShowErrorMessage("Please select a user to copy quick lists from.");
+            }
+            else if (destinationUser == null)
+            {
+                ShowErrorMessage("Please select a user to copy quick lists to.");
+            }
+            else
+            {
+                DeleteQuickListsOfUser(destinationUser.QLNameID, GetDestinationConnectionString());
+
+                CopyQuickLists(sourceUser.QLNameID, destinationUser.QLNameID);
+            }
+        }
+
+        private void DeleteQuickListsOfUser(int qlNameID, string connectionString)
+        {
+            try
+            {
+                using (var model = new WintotalModel(connectionString))
+                {
+                    var quickLists = from q in model.QuickLists
+                                     where q.QLNameID == qlNameID
+                                     select q;
+                    foreach (var quickList in quickLists.ToList())
+                    {
+                        model.QuickLists.Remove(quickList);
+                    }
+
+                    model.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                ShowErrorMessage("An error occurred while attempting to delete the destination user's quick lists: " + e.Message);
+            }
+        }
+
+        private void CopyQuickLists(int sourceQlNameID, int destQlNameID)
+        {
+            // The technique used to copy the quick lists came from http://stackoverflow.com/a/18114082/132374
+            try
+            {
+                using (var sourceModel = new WintotalModel(txtSourceConnString.Text))
+                {
+                    using (var destinationModel = new WintotalModel(GetDestinationConnectionString()))
+                    {
+                        var quickLists = (from q in sourceModel.QuickLists
+                                          where q.QLNameID == sourceQlNameID
+                                          select q).AsNoTracking();
+                        foreach (var quickList in quickLists.ToList())
+                        {
+                            // Assign the quick list to the destination user
+                            quickList.QLNameID = destQlNameID;
+
+                            // The PK value will be recreated
+                            quickList.QLID = 0;
+
+                            foreach (var entry in quickList.QuickListEntries)
+                            {
+                                // The PK value will be recreated
+                                entry.QLEntryID = 0;
+                            }
+
+                            destinationModel.QuickLists.Add(quickList);
+                        }
+
+                        destinationModel.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ShowErrorMessage("An error occurred while copying the quick lists: " + e.Message);
+            }
+        }
+
+        private void ShowErrorMessage(string message)
+        {
+            MessageBox.Show(message, "Error");
+        }
+    }
+
+    class WintotalUser
+    {
+        public int QLNameID { get; set; }
+        public string Name { get; set; }
     }
 }

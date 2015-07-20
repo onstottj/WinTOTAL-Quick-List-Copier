@@ -13,12 +13,12 @@ namespace WinTOTAL_Quick_List_Copier.data
 
         public int QLID { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = true)]
         [StringLength(25)]
         public string FieldName { get; set; }
 
         [Column(TypeName = "text")]
-        [Required]
+        [Required(AllowEmptyStrings = true)]
         public string EntryText { get; set; }
 
         public virtual QuickList QuickList { get; set; }
