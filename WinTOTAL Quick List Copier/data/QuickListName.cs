@@ -16,7 +16,7 @@ namespace WinTOTAL_Quick_List_Copier.data
         [Key]
         public int QLNameID { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = true)]
         [StringLength(50)]
         public string Name { get; set; }
 

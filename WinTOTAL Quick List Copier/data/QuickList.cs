@@ -19,17 +19,17 @@ namespace WinTOTAL_Quick_List_Copier.data
 
         public int QLNameID { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = true)]
         [StringLength(25)]
         public string FieldName { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = true)]
         [StringLength(20)]
         public string FormType { get; set; }
 
         public int Number { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = true)]
         [StringLength(20)]
         public string ShortName { get; set; }
 
