@@ -41,11 +41,14 @@
                                 2)  Choose a user from Source to copy all quick lists from
                             </TextBlock>
                             <TextBlock TextWrapping="WrapWithOverflow">
-                                3)  Choose a user from Destination.  Their quick lists will be deleted in step 4, and the Source user's quick lists will be copied there.
+                                3)  Choose a user from Destination
                             </TextBlock>
                             <TextBlock TextWrapping="WrapWithOverflow">
                                 4)  Click 
-                                <Hyperlink x:Name="lblCopyQuickLists" Click="lblCopyQuickLists_Click">copy Source user lists to overwrite Destination user's lists</Hyperlink>
+                                <Hyperlink x:Name="lblCopyQuickLists" Click="lblCopyQuickLists_Click">copy Source 
+                                user's quick lists to Destination user</Hyperlink>.  The destination user will 
+                                then have their original quick lists, and also a copy of the source user's quick 
+                                lists.
                             </TextBlock>
                         </StackPanel>
                     </StackPanel>
@@ -69,6 +72,30 @@
                             <ListBox DockPanel.Dock="Bottom" x:Name="lbDestinationUsers"/>
                         </DockPanel>
                     </Grid>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Delete quick lists">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock TextWrapping="WrapWithOverflow">
+                                1)  Load the list of users on the destination server by clicking 
+                                <Hyperlink x:Name="lblLoadUsersForDeletion" Click="lblLoadUsersForDeletion_Click">refresh</Hyperlink>
+                            </TextBlock>
+                            <TextBlock TextWrapping="WrapWithOverflow">
+                                2)  Pick a user whose quick lists you'd like to delete
+                            </TextBlock>
+                            <TextBlock TextWrapping="WrapWithOverflow">
+                                3)  Click 
+                                <Hyperlink x:Name="lblDeleteQuickLists" Click="lblDeleteQuickLists_Click">delete user's quick lists</Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <DockPanel DockPanel.Dock="Bottom">
+                        <Label  DockPanel.Dock="Top">User:</Label>
+                        <ListBox DockPanel.Dock="Bottom" x:Name="lbDestinationUsersForDeletion"/>
+                    </DockPanel>
                 </DockPanel>
             </TabItem>
         </TabControl>

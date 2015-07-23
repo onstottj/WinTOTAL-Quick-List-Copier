@@ -1,28 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WinTOTAL_Quick_List_Copier.data;
 using WinTOTAL_Quick_List_Copier.ui;
+using WinTOTAL_Quick_List_Copier.wintotal;
 
 namespace WinTOTAL_Quick_List_Copier
 {
     public partial class MainWindow : Window
     {
-        private Dictionary<int, string> sourceUsers = new Dictionary<int, string>();
-        private Dictionary<int, string> destinationUsers = new Dictionary<int, string>();
-
         public MainWindow()
         {
             this.Resources["InverseBooleanConverter"] = new InverseBooleanConverter();
@@ -35,10 +23,10 @@ namespace WinTOTAL_Quick_List_Copier
         {
             // Load source users
             var sourceConnStr = txtSourceConnString.Text;
-            LoadUserList(sourceConnStr, lbSourceUsers, sourceUsers);
+            LoadUserList(sourceConnStr, lbSourceUsers);
 
             // Load destination users
-            LoadUserList(GetDestinationConnectionString(), lbDestinationUsers, destinationUsers);
+            LoadUserList(GetDestinationConnectionString(), lbDestinationUsers);
         }
 
         private string GetDestinationConnectionString()
@@ -47,7 +35,7 @@ namespace WinTOTAL_Quick_List_Copier
             return isSingleServer ? txtSourceConnString.Text : txtDestinationConnStr.Text;
         }
 
-        private async void LoadUserList(string connectionString, ListBox listbox, Dictionary<int, string> userDictionary)
+        private async void LoadUserList(string connectionString, ListBox listbox)
         {
             listbox.Items.Clear();
             listbox.Items.Add("Loading...");
@@ -69,17 +57,15 @@ namespace WinTOTAL_Quick_List_Copier
                     listbox.SelectedValuePath = "QLNameID";
                     listbox.DisplayMemberPath = "Name";
 
-                    userDictionary.Clear();
                     foreach (var user in users.Distinct())
                     {
                         listbox.Items.Add(user);
-                        userDictionary.Add(user.QLNameID, user.Name);
                     }
                 }
             }
             catch (Exception e)
             {
-                ShowErrorMessage("An error occurred loading data: " + e.Message);
+                UiUtilities.ShowErrorMessage("An error occurred loading data: " + e.Message);
             }
         }
 
@@ -89,85 +75,37 @@ namespace WinTOTAL_Quick_List_Copier
             var destinationUser = (WintotalUser)lbDestinationUsers.SelectedItem;
             if (sourceUser == null)
             {
-                ShowErrorMessage("Please select a user to copy quick lists from.");
+                UiUtilities.ShowErrorMessage("Please select a user to copy quick lists from.");
             }
             else if (destinationUser == null)
             {
-                ShowErrorMessage("Please select a user to copy quick lists to.");
+                UiUtilities.ShowErrorMessage("Please select a user to copy quick lists to.");
             }
             else
             {
-                DeleteQuickListsOfUser(destinationUser.QLNameID, GetDestinationConnectionString());
-
-                CopyQuickLists(sourceUser.QLNameID, destinationUser.QLNameID);
+                var sourceConnStr = txtSourceConnString.Text;
+                var destConnStr = GetDestinationConnectionString();
+                WintotalUtilities.CopyQuickLists(sourceUser.QLNameID, destinationUser.QLNameID, sourceConnStr, destConnStr);
             }
         }
 
-        private void DeleteQuickListsOfUser(int qlNameID, string connectionString)
+        private void lblLoadUsersForDeletion_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                using (var model = new WintotalModel(connectionString))
-                {
-                    var quickLists = from q in model.QuickLists
-                                     where q.QLNameID == qlNameID
-                                     select q;
-                    foreach (var quickList in quickLists.ToList())
-                    {
-                        model.QuickLists.Remove(quickList);
-                    }
-
-                    model.SaveChanges();
-                }
-            }
-            catch (Exception e)
-            {
-                ShowErrorMessage("An error occurred while attempting to delete the destination user's quick lists: " + e.Message);
-            }
+            LoadUserList(GetDestinationConnectionString(), lbDestinationUsersForDeletion);
         }
 
-        private void CopyQuickLists(int sourceQlNameID, int destQlNameID)
+        private void lblDeleteQuickLists_Click(object sender, RoutedEventArgs e)
         {
-            // The technique used to copy the quick lists came from http://stackoverflow.com/a/18114082/132374
-            try
+            var destinationUser = (WintotalUser)lbDestinationUsersForDeletion.SelectedItem;
+            if (destinationUser == null)
             {
-                using (var sourceModel = new WintotalModel(txtSourceConnString.Text))
-                {
-                    using (var destinationModel = new WintotalModel(GetDestinationConnectionString()))
-                    {
-                        var quickLists = (from q in sourceModel.QuickLists
-                                          where q.QLNameID == sourceQlNameID
-                                          select q).AsNoTracking();
-                        foreach (var quickList in quickLists.ToList())
-                        {
-                            // Assign the quick list to the destination user
-                            quickList.QLNameID = destQlNameID;
-
-                            // The PK value will be recreated
-                            quickList.QLID = 0;
-
-                            foreach (var entry in quickList.QuickListEntries)
-                            {
-                                // The PK value will be recreated
-                                entry.QLEntryID = 0;
-                            }
-
-                            destinationModel.QuickLists.Add(quickList);
-                        }
-
-                        destinationModel.SaveChanges();
-                    }
-                }
+                UiUtilities.ShowErrorMessage("Please select a user whose quick lists should be deleted.");
             }
-            catch (Exception e)
+            else
             {
-                ShowErrorMessage("An error occurred while copying the quick lists: " + e.Message);
+                var destConnStr = GetDestinationConnectionString();
+                WintotalUtilities.DeleteQuickListsOfUser(destinationUser.QLNameID, destConnStr);
             }
-        }
-
-        private void ShowErrorMessage(string message)
-        {
-            MessageBox.Show(message, "Error");
         }
     }
 
