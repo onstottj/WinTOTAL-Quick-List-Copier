@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WinTOTAL_Quick_List_Copier.data;
 using WinTOTAL_Quick_List_Copier.ui;
+using WinTOTAL_Quick_List_Copier.wintotal;
 
 namespace WinTOTAL_Quick_List_Copier
 {
@@ -23,46 +15,103 @@ namespace WinTOTAL_Quick_List_Copier
         {
             this.Resources["InverseBooleanConverter"] = new InverseBooleanConverter();
             InitializeComponent();
+
+            txtSourceConnString.Focus();
         }
 
-        private void lnkRefreshSource_Click(object sender, RoutedEventArgs e)
+        private void lblLoadUsers_Click(object sender, RoutedEventArgs e)
         {
-            UpdateCurrentData(txtSourceConnString.Text);
+            // Load source users
+            var sourceConnStr = txtSourceConnString.Text;
+            LoadUserList(sourceConnStr, lbSourceUsers);
+
+            // Load destination users
+            LoadUserList(GetDestinationConnectionString(), lbDestinationUsers);
         }
 
-        private void lnkRefreshDestination_Click(object sender, RoutedEventArgs e)
+        private string GetDestinationConnectionString()
         {
-            UpdateCurrentData(txtDestinationConnStr.Text);
+            var isSingleServer = chkSingleServer.IsChecked.Value;
+            return isSingleServer ? txtSourceConnString.Text : txtDestinationConnStr.Text;
         }
 
-        private void UpdateCurrentData(string connectionString)
+        private async void LoadUserList(string connectionString, ListBox listbox)
         {
-            lbQuicklistUsers.Items.Clear();
+            listbox.Items.Clear();
+            listbox.Items.Add("Loading...");
 
             try
             {
-                var finalConnectionString = @"metadata=res://*/data.WintotalSqlModel.csdl
-                |res://*/data.WintotalSqlModel.ssdl
-                |res://*/data.WintotalSqlModel.msl;
-                provider=System.Data.SqlClient;
-                provider connection string=" + "\"" + connectionString + "\"";
-
-                using (var entities = new WinTOTAL_Quick_List_Copier.data.Entities())
+                using (var model = new WintotalModel(connectionString))
                 {
-                    entities.ChangeDatabase(connectionString);
-                    var names = from n in entities.QuickListNames
-                                orderby n.Name
-                                select n.Name;
-                    foreach (var name in names.Distinct())
+                    var users = await (from n in model.QuickListNames
+                                       join q in model.QuickLists on n.QLNameID equals q.QLNameID into qlstats
+                                       orderby n.Name
+                                       select new WintotalUser
+                                       {
+                                           QLNameID = n.QLNameID,
+                                           Name = n.Name + " - " + qlstats.Count() + " list(s)"
+                                       }).ToListAsync();
+
+                    listbox.Items.Clear();
+                    listbox.SelectedValuePath = "QLNameID";
+                    listbox.DisplayMemberPath = "Name";
+
+                    foreach (var user in users.Distinct())
                     {
-                        lbQuicklistUsers.Items.Add(name);
+                        listbox.Items.Add(user);
                     }
                 }
             }
             catch (Exception e)
             {
-                MessageBox.Show("An error occurred loading data: " + e.Message);
+                UiUtilities.ShowErrorMessage("An error occurred loading data: " + e.Message);
             }
         }
+
+        private void lblCopyQuickLists_Click(object sender, RoutedEventArgs e)
+        {
+            var sourceUser = (WintotalUser)lbSourceUsers.SelectedItem;
+            var destinationUser = (WintotalUser)lbDestinationUsers.SelectedItem;
+            if (sourceUser == null)
+            {
+                UiUtilities.ShowErrorMessage("Please select a user to copy quick lists from.");
+            }
+            else if (destinationUser == null)
+            {
+                UiUtilities.ShowErrorMessage("Please select a user to copy quick lists to.");
+            }
+            else
+            {
+                var sourceConnStr = txtSourceConnString.Text;
+                var destConnStr = GetDestinationConnectionString();
+                WintotalUtilities.CopyQuickLists(sourceUser.QLNameID, destinationUser.QLNameID, sourceConnStr, destConnStr);
+            }
+        }
+
+        private void lblLoadUsersForDeletion_Click(object sender, RoutedEventArgs e)
+        {
+            LoadUserList(GetDestinationConnectionString(), lbDestinationUsersForDeletion);
+        }
+
+        private void lblDeleteQuickLists_Click(object sender, RoutedEventArgs e)
+        {
+            var destinationUser = (WintotalUser)lbDestinationUsersForDeletion.SelectedItem;
+            if (destinationUser == null)
+            {
+                UiUtilities.ShowErrorMessage("Please select a user whose quick lists should be deleted.");
+            }
+            else
+            {
+                var destConnStr = GetDestinationConnectionString();
+                WintotalUtilities.DeleteQuickListsOfUser(destinationUser.QLNameID, destConnStr);
+            }
+        }
+    }
+
+    class WintotalUser
+    {
+        public int QLNameID { get; set; }
+        public string Name { get; set; }
     }
 }
