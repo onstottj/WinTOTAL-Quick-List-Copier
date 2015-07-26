@@ -18,9 +18,10 @@ namespace WinTOTAL_Quick_List_Copier.wintotal
                 {
                     using (var destinationModel = new WintotalModel(destConnStr))
                     {
-                        var quickLists = (from q in sourceModel.QuickLists
-                                          where q.QLNameID == sourceQlNameID
-                                          select q).AsNoTracking();
+                        var quickLists = sourceModel.QuickLists
+                            .Where(q => q.QLNameID == sourceQlNameID)
+                            .Include("QuickListEntries")
+                            .AsNoTracking();
                         foreach (var quickList in quickLists.ToList())
                         {
                             // Assign the quick list to the destination user
@@ -28,13 +29,7 @@ namespace WinTOTAL_Quick_List_Copier.wintotal
 
                             // The PK value will be recreated
                             quickList.QLID = 0;
-
-                            foreach (var entry in quickList.QuickListEntries)
-                            {
-                                // The PK value will be recreated
-                                entry.QLEntryID = 0;
-                            }
-
+                            
                             destinationModel.QuickLists.Add(quickList);
                         }
 
